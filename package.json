@@ -1,0 +1,17 @@
+{
+  "name": "testing_marko_syntax",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "uvu tests"
+  },
+  "type": "module",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "typescript": "^5.5.4",
+    "uvu": "^0.5.6"
+  }
+}
