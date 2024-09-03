@@ -12,17 +12,23 @@ let counter = () => html`
         button [ onclick=${click} ] -- Increment ${count}`
 
 
-let listItem = (e) => html`li -- ${e}`
 
+let listItem = (e) => html`li [style=color:red;] -- ${e}`
+let even = (e) => e % 2 === 0;
+let evenListItem = (number) => html`when ${() => even(number)} then ${() => listItem(number)}`
 
 let list = () => html`
-    ul.bg-blue
+    .container
+      h1 -- Even numbers
+      ul.bg-blue
+        #each
+          of -- ${numbers}
+          as -- ${evenListItem}
 
-      #each
-        of -- ${numbers}
-        as -- ${(e) => html`p -- Another way ${e}`}
-
-      each ${numbers} as ${listItem}`
+    .container
+      h1 -- All numbers
+      ul.bg-blue
+        each ${numbers} as ${number => html`li -- ${number}`}`
 
 let moreThan5 = mem(() => count() > 5);
 let showWon = () => html`p -- count is greater than 5`
