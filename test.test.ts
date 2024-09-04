@@ -281,3 +281,27 @@ test('when and each block', () => {
 	])
 
 })
+
+test('multiline text', () => {
+	let hh = f`
+p ---
+text that is multiline
+hopefully this works
+---`
+	expect(hh).toEqual([
+		{
+			tag: 'p',
+			children: [
+				{
+					tag: 'text',
+					value: '\ntext that is multiline\nhopefully this works\n',
+					attrs: {},
+					indent: 0,
+					children: []
+				}
+			],
+			attrs: {}, indent: 0
+		}
+	])
+
+})

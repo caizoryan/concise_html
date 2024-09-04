@@ -167,6 +167,8 @@ class Parser {
             if (tag === "")
                 return undefined;
         }
+        else if (this.current.type === "expression") {
+        }
         attrs = this.parseAttrs();
         if (tag === "when" || tag === "each") {
             if (tag === "each") {
@@ -259,37 +261,87 @@ class Parser {
             { tag: "children", value: asValue.value, attrs: {}, children: [], indent: indent + 2 }
         ];
     }
-    parseText() {
+    parseSingleLineText() {
         let ret = [];
         let text = "";
+        while (this.char() !== `\n`) {
+            // if this.char() === undefined, then we have reached the end of the string
+            // if next is expression, add text to ret, then add expression and keep going till terminated by \n
+            if (this.char() === undefined) {
+                ret.push(this.makeTextElement(text));
+                text = "";
+                let next = this.next();
+                if (next === undefined)
+                    break;
+                if (typeof next !== "string") {
+                    ret.push(this.makeExpressionElement(next.value));
+                    this.next();
+                }
+            }
+            else {
+                text += this.eat();
+            }
+        }
+        if (text !== "")
+            ret.push(this.makeTextElement(text));
+        return ret;
+    }
+    lookAhead(n = 1) {
+        let c = this.cursor;
+        let current = this.current;
+        return current[c + n];
+    }
+    isThreeHyphens() {
+        return this.lookAhead(0) === "-" && this.lookAhead(1) === "-" && this.lookAhead(2) === "-";
+    }
+    parseMultiLineText() {
+        let ret = [];
+        let text = "";
+        while (!this.isThreeHyphens()) {
+            if (this.char() === undefined) {
+                ret.push(this.makeTextElement(text));
+                text = "";
+                let next = this.next();
+                if (next === undefined)
+                    break;
+                if (typeof next !== "string") {
+                    ret.push(this.makeExpressionElement(next.value));
+                    this.next();
+                }
+            }
+            else {
+                text += this.eat();
+            }
+        }
+        if (this.isThreeHyphens()) {
+            this.eat();
+            this.eat();
+            this.eat();
+        }
+        if (text !== "")
+            ret.push(this.makeTextElement(text));
+        return ret;
+    }
+    parseText() {
+        let ret = [];
         this.eatWhitespace();
         if (this.char() === "-") {
             this.eat();
             if (this.char() === "-") {
-                this.eat();
-                this.eatWhitespace();
-                while (this.char() !== `\n`) {
-                    // if this.char() === undefined, then we have reached the end of the string
-                    // if next is expression, add text to ret, then add expression and keep going till terminated by \n
-                    if (this.char() === undefined) {
-                        ret.push(this.makeTextElement(text));
-                        text = "";
-                        let next = this.next();
-                        if (next === undefined)
-                            break;
-                        if (typeof next !== "string") {
-                            ret.push(this.makeExpressionElement(next.value));
-                            this.next();
-                        }
-                    }
-                    else {
-                        text += this.eat();
-                    }
+                if (this.lookAhead() === "-") {
+                    this.eat();
+                    this.eat();
+                    this.eatWhitespace();
+                    ret = this.parseMultiLineText();
                 }
-                if (text !== "")
-                    ret.push(this.makeTextElement(text));
+                else {
+                    this.eat();
+                    this.eatWhitespace();
+                    ret = this.parseSingleLineText();
+                }
             }
         }
+        console.log("ret", ret);
         return ret;
     }
     makeExpressionElement(value) {
