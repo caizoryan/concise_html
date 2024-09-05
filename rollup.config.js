@@ -1,4 +1,5 @@
 import resolve from "@rollup/plugin-node-resolve";
+import typescript from "@rollup/plugin-typescript";
 
 export default {
     input: "./script.ts",
@@ -7,5 +8,5 @@ export default {
         format: "es",
         sourcemap: true,
     },
-    plugins: [resolve()],
+    plugins: [resolve(), typescript()],
 };

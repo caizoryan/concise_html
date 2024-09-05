@@ -10,8 +10,8 @@
 // if text is multiline, then will start with --- and end with ---
 // children based on indentation
 
-import { h as f, each, if_then } from "../solid_monke/solid_monke.js"
-export function hh(strings: string[], ...values: any[]) {
+import { h as f, each, if_then } from "./solid_monke/solid_monke.js"
+export function hh(strings: TemplateStringsArray, ...values: any[]) {
 	// make them one array
 	let arr: any[] = strings.reduce((acc, str, i) => {
 		//@ts-ignore
@@ -70,6 +70,7 @@ function converAstToHyperscript(ast: Element[]) {
 			if (of && children && of?.value && children?.value) {
 				let e = () => each(of.value, children.value)
 				console.log("pushed each")
+				console.log(of.value, children.value)
 				ret.push(e)
 			}
 			else {
